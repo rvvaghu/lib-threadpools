@@ -22,7 +22,7 @@ impl ThreadPool {
 
         let r_work = Arc::new(Mutex::new(r_work));
 
-        for id in 0..=no_of_threads {
+        for id in 0..no_of_threads.max(1) {
             let thread_internal = UnitThread::new(id, r_work.clone());
             threads.push(thread_internal);
         }
