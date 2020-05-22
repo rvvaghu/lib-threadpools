@@ -1,22 +1,32 @@
 use super::{unit_thread::UnitThread, util::job, util::job::Work};
-use crossbeam::channel::{unbounded, Sender};
+use crossbeam::{
+    channel::{unbounded, Sender},
+    sync::ShardedLock,
+};
+use std::sync::Arc;
 
 pub struct ThreadPool {
     threads: Vec<UnitThread>,
     s_work: Sender<job::Work>,
+    terminate: Arc<ShardedLock<bool>>,
 }
 
 impl ThreadPool {
     pub fn new(no_of_threads: usize) -> Self {
         let mut threads: Vec<UnitThread> = Vec::new();
         let (s_work, r_work) = unbounded();
+        let terminate = Arc::new(ShardedLock::new(false));
 
         for id in 0..no_of_threads.max(1) {
-            let thread_internal = UnitThread::new(id, r_work.clone());
+            let thread_internal = UnitThread::new(id, r_work.clone(), terminate.clone());
             threads.push(thread_internal);
         }
 
-        Self { threads, s_work }
+        Self {
+            threads,
+            s_work,
+            terminate,
+        }
     }
 
     pub fn execute<F>(&self, f: F)
@@ -31,9 +41,8 @@ impl ThreadPool {
 impl Drop for ThreadPool {
     fn drop(&mut self) {
         println!("Sending terminate message to all workers.");
-
-        for _ in &mut self.threads {
-            self.s_work.send(Work::Terminate).unwrap();
+        {
+            *(self.terminate.write().unwrap()) = false;
         }
 
         println!("Shutting down all workers.");

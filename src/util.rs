@@ -10,7 +10,6 @@ pub fn sleep_millis(t: u64) {
 
 pub(crate) mod job {
     pub(crate) enum Work {
-        Terminate,
         NextWork(DoWork),
     }
 
