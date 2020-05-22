@@ -20,6 +20,7 @@ impl UnitThread {
         let handle: JoinHandle<()> = spawn(move || loop {
             {
                 let t = terminate.read().unwrap();
+                println!("thread {}, reading {}", id, *t);
                 if *t == true {
                     break;
                 };
@@ -29,6 +30,7 @@ impl UnitThread {
 
             match work {
                 NextWork(w) => w.call_box(),
+                Work::Terminate => break,
             }
         });
 
