@@ -1,26 +1,15 @@
 use super::{unit_thread::UnitThread, util::job, util::job::Work};
-use std::sync::{
-    mpsc::{channel, Sender},
-    Arc, Mutex,
-};
+use crossbeam::channel::{unbounded, Sender};
 
 pub struct ThreadPool {
     threads: Vec<UnitThread>,
     s_work: Sender<job::Work>,
 }
+
 impl ThreadPool {
-    /// Initializes new threadpool
-    /// ```
-    /// #use super::ThreadPool;
-    /// #let thpool = new(5);
-    /// #assert_eq!(thpool, ThreadPool{});
-    /// ```
     pub fn new(no_of_threads: usize) -> Self {
         let mut threads: Vec<UnitThread> = Vec::new();
-
-        let (s_work, r_work) = channel();
-
-        let r_work = Arc::new(Mutex::new(r_work));
+        let (s_work, r_work) = unbounded();
 
         for id in 0..no_of_threads.max(1) {
             let thread_internal = UnitThread::new(id, r_work.clone());
