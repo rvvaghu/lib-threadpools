@@ -36,6 +36,16 @@ impl ThreadPool {
         let j = Box::new(f);
         self.s_work.send(Work::NextWork(j)).unwrap();
     }
+
+    pub fn join_all(&mut self){
+        for thread in &mut self.threads {
+            println!("Tread {}, is done.", thread.id);
+
+            if let Some(thread) = thread.handle.take() {
+                thread.join().unwrap();
+            }
+        }
+    }
 }
 
 impl Drop for ThreadPool {
