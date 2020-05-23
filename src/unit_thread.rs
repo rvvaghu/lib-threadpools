@@ -12,19 +12,21 @@ pub(crate) struct UnitThread {
 }
 
 impl UnitThread {
+    /// Creates new thread, is available only to the crate
+    ///
+    ///
+
     pub(crate) fn new(
         id: usize,
         r_work: Receiver<Work>,
         terminate: Arc<ShardedLock<bool>>,
     ) -> Self {
         let handle: JoinHandle<()> = spawn(move || loop {
-            {
-                let t = terminate.read().unwrap();
-                println!("thread {}, reading {}", id, *t);
-                if *t == true {
-                    break;
-                };
-            }
+            let t = *(terminate.read().unwrap());
+            println!("thread {}, reading {}", id, t);
+            if t == true {
+                break;
+            };
 
             let work = r_work.recv().unwrap();
 

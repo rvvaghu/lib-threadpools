@@ -17,10 +17,10 @@ impl ThreadPool {
         let (s_work, r_work) = unbounded();
         let terminate = Arc::new(ShardedLock::new(false));
 
-        for id in 0..no_of_threads.max(1) {
+        (0..no_of_threads.max(1)).for_each(|id| {
             let thread_internal = UnitThread::new(id, r_work.clone(), terminate.clone());
             threads.push(thread_internal);
-        }
+        });
 
         Self {
             threads,
