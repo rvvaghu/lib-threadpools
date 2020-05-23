@@ -1,6 +1,6 @@
 [package]
 name = "lib_threadpools"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["R V Vivek <rvvaghu@hotmail.com>"]
 edition = "2018"
 
