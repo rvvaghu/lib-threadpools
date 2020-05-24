@@ -38,8 +38,14 @@ impl ThreadPool {
     }
 
     pub fn join_all(&mut self){
+
+        for _ in &self.threads {
+            self.s_work.send(Work::Terminate).unwrap();
+        }
+
         for thread in &mut self.threads {
-            println!("Tread {}, is done.", thread.id);
+    
+            println!("Joining worker {}", thread.id);
 
             if let Some(thread) = thread.handle.take() {
                 thread.join().unwrap();
@@ -53,9 +59,6 @@ impl Drop for ThreadPool {
         println!("Sending terminate message to all workers.");
         {
             *(self.terminate.write().unwrap()) = true;
-        }
-        for _ in &self.threads {
-            self.s_work.send(Work::Terminate).unwrap();
         }
 
         println!("Shutting down all workers.");
