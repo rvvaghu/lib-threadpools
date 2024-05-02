@@ -1,2 +1,7 @@
 /target
 Cargo.lock
+.idea
+/.idea/.gitignore
+/.idea/lib-threadpools.iml
+/.idea/modules.xml
+/.idea/vcs.xml
