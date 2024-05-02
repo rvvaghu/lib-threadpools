@@ -23,7 +23,7 @@ impl UnitThread {
     ) -> Self {
         let handle: JoinHandle<()> = spawn(move || loop {
             let t = *(terminate.read().unwrap());
-            println!("thread {}, reading {}", id, t);
+            
             if t == true {
                 break;
             };
